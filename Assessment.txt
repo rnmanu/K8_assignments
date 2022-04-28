@@ -1,0 +1,109 @@
+Question:-1
+
+uses of a DaemonSet are:
+running a cluster storage daemon on every node
+running a logs collection daemon on every node
+running a node monitoring daemon on every node
+
+ReplicaSet makes it so that the given number of pods always exist even if one is deleted
+
+--------------------------------------------------------------------------------------
+Question:- 2
+
+We need to updated image of container 
+eg:- kubectl set image deployment/nginx-deployment nginx=nginx:1.16.1
+
+
+---------------------------------------------------------------------------------------
+Question :- 3
+
+Steps for debugging include checking routes, pods and services.
+First check would be the definition of the replica set yaml file and seeing its data, 
+if it has proper port number and selectors. Then, 
+nodeport yaml would be checked for its ports and that it should match the application port number. 
+Lastly, check the labels of the deoployment to be the same as the nodeport.
+
+---------------------------------------------------------------------------------------
+
+Question:- 4
+
+[root@ip-172-31-22-238 ~]# cd /root
+[root@ip-172-31-22-238 ~]# git clone https://github.com/omrKalyan/example-voting                                                                                                      directory.
+[root@ip-172-31-22-238 ~]# ls
+example-voting-app  kubernetes-training
+[root@ip-172-31-22-238 ~]# cd example-voting-app
+[root@ip-172-31-22-238 example-voting-app]# ls
+architecture.png               docker-compose.yml  MAINTAINERS  worker
+dockercloud.yml                docker-stack.yml    README.md
+docker-compose-javaworker.yml  k8s-specifications  result
+docker-compose-simple.yml      LICENSE             vote
+[root@ip-172-31-22-238 example-voting-app]# cd k8s-specifications
+[root@ip-172-31-22-238 k8s-specifications]# ll
+total 36
+-rw-r--r-- 1 root root 401 Apr 28 09:17 db-deployment.yaml
+-rw-r--r-- 1 root root 146 Apr 28 09:17 db-service.yaml
+-rw-r--r-- 1 root root 402 Apr 28 09:17 redis-deployment.yaml
+-rw-r--r-- 1 root root 152 Apr 28 09:17 redis-service.yaml
+-rw-r--r-- 1 root root 299 Apr 28 09:17 result-deployment.yaml
+-rw-r--r-- 1 root root 195 Apr 28 09:17 result-service.yaml
+-rw-r--r-- 1 root root 289 Apr 28 09:17 vote-deployment.yaml
+-rw-r--r-- 1 root root 192 Apr 28 09:17 vote-service.yaml
+-rw-r--r-- 1 root root 292 Apr 28 09:17 worker-deployment.yaml
+[root@ip-172-31-22-238 k8s-specifications]# kubectl apply -f .
+deployment.apps/db created
+service/db created
+deployment.apps/redis created
+service/redis created
+deployment.apps/result created
+deployment.apps/worker created
+[root@ip-172-31-22-238 k8s-specifications]# kubectl get all
+[root@ip-172-31-22-238 k8s-specifications]# pwd
+/root/example-voting-app/k8s-specifications
+[root@ip-172-31-22-238 k8s-specifications]# ls
+db-deployment.yaml     redis-service.yaml      vote-deployment.yaml
+db-service.yaml        result-deployment.yaml  vote-service.yaml
+redis-deployment.yaml  result-service.yaml     worker-deployment.yaml
+[root@ip-172-31-22-238 k8s-specifications]# cd ..
+[root@ip-172-31-22-238 example-voting-app]# ls
+architecture.png               docker-compose.yml  MAINTAINERS  worker
+dockercloud.yml                docker-stack.yml    README.md
+docker-compose-javaworker.yml  k8s-specifications  result
+docker-compose-simple.yml      LICENSE             vote
+[root@ip-172-31-22-238 example-voting-app]# cd vote
+[root@ip-172-31-22-238 vote]# ls
+app.py  Dockerfile  requirements.txt  static  templates
+[root@ip-172-31-22-238 vote]# vi app.py
+[root@ip-172-31-22-238 vote]# ls
+app.py  Dockerfile  requirements.txt  static  templates
+[root@ip-172-31-22-238 vote]# pwd
+/root/example-voting-app/vote
+[root@ip-172-31-22-238 vote]# cd ..
+[root@ip-172-31-22-238 example-voting-app]# ls
+architecture.png               docker-stack.yml    result
+dockercloud.yml                k8s-specifications  vote
+docker-compose-javaworker.yml  LICENSE             worker
+docker-compose-simple.yml      MAINTAINERS
+docker-compose.yml             README.md
+[root@ip-172-31-22-238 example-voting-app]# cd worker
+[root@ip-172-31-22-238 worker]# ls
+Dockerfile  Dockerfile.j  pom.xml  src
+[root@ip-172-31-22-238 worker]# cd src
+[root@ip-172-31-22-238 src]# ls
+main  Worker
+[root@ip-172-31-22-238 src]# cd Worker
+[root@ip-172-31-22-238 Worker]# ls
+Program.cs  Worker.csproj
+[root@ip-172-31-22-238 Worker]# cd /root/
+[root@ip-172-31-22-238 ~]# ls
+[root@ip-172-31-22-238 ~]# cd example-voting-app
+[root@ip-172-31-22-238 example-voting-app]# kubectl get po
+[root@ip-172-31-22-238 example-voting-app]# kubectl delete po redis-8                                                                                        68d64d78-h9x6m
+pod "redis-868d64d78-h9x6m" deleted
+[root@ip-172-31-22-238 example-voting-app]# kubectl delete po result-                                                                                        5d57b59f4b-rmcft
+pod "result-5d57b59f4b-rmcft" deleted
+---------------------------------------
+After deleting voter pod - no difference, result page still updating. new vote pod was created immediately. container ID is different.
+Same for worker pod. Container restarts here tho as an additive.
+For db pod, results dont get updated. they are captured but not updated in result-app.
+
+To fix, delete the result pod.
